@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Importe o AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -111,6 +111,25 @@ const Roupa = ({ navigation }) => {
       }
     };
     getRoupas();
+  }, []);
+
+  const getRoupasAsyncStorage = async () => {
+    try {
+      const data = await AsyncStorage.getItem("roupaData");
+      if (data !== null) {
+        const parsedData = JSON.parse(data);
+        return parsedData;
+      }
+    } catch (error) {
+      console.error("Erro ao ler os dados do AsyncStorage:", error);
+    }
+    return [];
+  };
+
+  useEffect(() => {
+    getRoupasAsyncStorage().then((data) => {
+      setRoupa(data);
+    });
   }, []);
 
   return (
