@@ -5,6 +5,7 @@ import {
   Image,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -28,6 +29,9 @@ const dadosDaRoupa = [
 const Roupa = ({ navigation }) => {
   const [roupa, setRoupa] = useState(dadosDaRoupa);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(null);
+  const [editedTamanho, setEditedTamanho] = useState("");
+  const [editedCor, setEditedCor] = useState("");
 
   const deleteRoupa = async (id) => {
     try {
@@ -47,8 +51,38 @@ const Roupa = ({ navigation }) => {
     }
   };
 
+  const editRoupa = async (id) => {
+    try {
+      const data = JSON.stringify({
+        tamanho: editedTamanho,
+        cor: editedCor,
+      });
+
+      const response = await fetch(`http://localhost:8080/api/roupas/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: data,
+      });
+
+      if (response.status === 200) {
+        const novaListaDeRoupas = [...roupa];
+        novaListaDeRoupas[id].tamanho = editedTamanho;
+        novaListaDeRoupas[id].cor = editedCor;
+        setRoupa(novaListaDeRoupas);
+        setEditing(null);
+      } else {
+        Alert.alert("Erro ao editar roupa.");
+      }
+    } catch (error) {
+      Alert.alert("Erro ao editar roupa:", error);
+      console.error("Erro ao editar roupa: ", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchRoupas = async () => {
+    const getRoupas = async () => {
       try {
         setLoading(true);
         const response = await fetch(`http://localhost:8080/api/roupas`);
@@ -63,7 +97,7 @@ const Roupa = ({ navigation }) => {
         setLoading(false);
       }
     };
-    fetchRoupas();
+    getRoupas();
   }, []);
 
   return (
@@ -78,8 +112,41 @@ const Roupa = ({ navigation }) => {
               style={styles.imagem}
               resizeMode="cover"
             />
-            <Text style={styles.texto}>Tamanho: {item.tamanho}</Text>
-            <Text style={styles.texto}>Cor: {item.cor}</Text>
+            {editing === index ? (
+              <>
+                <TextInput
+                  placeholder="Tamanho"
+                  value={editedTamanho}
+                  onChangeText={setEditedTamanho}
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="Cor"
+                  value={editedCor}
+                  onChangeText={setEditedCor}
+                  style={styles.input}
+                />
+                <TouchableOpacity onPress={() => editRoupa(index)}>
+                  <Icon name="check" size={20} color="white" />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Text style={styles.texto}>Tamanho: {item.tamanho}</Text>
+                <Text style={styles.texto}>Cor: {item.cor}</Text>
+                <TouchableOpacity
+                  onPress={() => setEditing(index)}
+                  style={styles.botaoEditar}
+                >
+                  <Icon
+                    style={styles.icon}
+                    name="edit"
+                    size={20}
+                    color="white"
+                  />
+                </TouchableOpacity>
+              </>
+            )}
             <TouchableOpacity
               onPress={() => deleteRoupa(index)}
               style={styles.botaoExcluir}
@@ -125,6 +192,21 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: "white",
   },
+  input: {
+    backgroundColor: "white",
+    paddingHorizontal: 8,
+    marginBottom: 8,
+  },
+  botaoEditar: {
+    backgroundColor: "#718096",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 30,
+    height: 30,
+    position: "absolute",
+    bottom: 5,
+    right: 50,
+  },
   botaoExcluir: {
     backgroundColor: "#718096",
     alignItems: "center",
@@ -134,6 +216,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 5,
     right: 5,
+  },
+  icon: {
+    top: 1,
+    left: 20,
   },
 });
 

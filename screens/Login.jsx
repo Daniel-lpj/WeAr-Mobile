@@ -49,14 +49,14 @@ const Login = ({ navigation }) => {
           style={styles.input}
           placeholder="Email"
           value={email}
-          onChangeText={(e) => setEmail(e)}
+          onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
           placeholder="Senha"
           secureTextEntry={true}
           value={senha}
-          onChangeText={(e) => setSenha(e)}
+          onChangeText={setSenha}
         />
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
