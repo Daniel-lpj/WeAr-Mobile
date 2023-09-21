@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import {
   Alert,
@@ -31,6 +32,10 @@ const Login = ({ navigation }) => {
         body: JSON.stringify(data),
       });
       if (response.status === 200) {
+        const userData = await response.json();
+
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+
         Alert.alert("Login bem-sucedido!");
         navigation.navigate("Roupa");
       } else {

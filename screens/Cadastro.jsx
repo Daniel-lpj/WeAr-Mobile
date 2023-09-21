@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import {
   Alert,
@@ -13,7 +14,7 @@ const Cadastro = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const handleLogin = async () => {
+  const handleCadastro = async () => {
     const data = {
       nome: nome,
       email: email,
@@ -29,6 +30,10 @@ const Cadastro = ({ navigation }) => {
         body: JSON.stringify(data),
       });
       if (response.status === 200) {
+        const userData = await response.json();
+
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+
         Alert.alert("Cadastro bem-sucedido!");
         navigation.navigate("Login");
       } else {
@@ -62,7 +67,7 @@ const Cadastro = ({ navigation }) => {
           value={senha}
           onChangeText={setSenha}
         />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <TouchableOpacity style={styles.button} onPress={handleCadastro}>
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>

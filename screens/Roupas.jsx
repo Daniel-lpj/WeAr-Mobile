@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Importe o AsyncStorage
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -42,6 +43,11 @@ const Roupa = ({ navigation }) => {
         const novaListaDeRoupas = [...roupa];
         novaListaDeRoupas.splice(id, 1);
         setRoupa(novaListaDeRoupas);
+
+        await AsyncStorage.setItem(
+          "roupaData",
+          JSON.stringify(novaListaDeRoupas)
+        );
       } else {
         Alert.alert("Erro ao excluir roupa.");
       }
@@ -72,6 +78,11 @@ const Roupa = ({ navigation }) => {
         novaListaDeRoupas[id].cor = editedCor;
         setRoupa(novaListaDeRoupas);
         setEditing(null);
+
+        await AsyncStorage.setItem(
+          "roupaData",
+          JSON.stringify(novaListaDeRoupas)
+        );
       } else {
         Alert.alert("Erro ao editar roupa.");
       }
@@ -92,6 +103,8 @@ const Roupa = ({ navigation }) => {
         const data = await response.json();
         setRoupa(data);
         setLoading(false);
+
+        await AsyncStorage.setItem("roupaData", JSON.stringify(data));
       } catch (error) {
         console.error("Erro ao buscar lista de roupas: " + error);
         setLoading(false);
