@@ -32,7 +32,7 @@ const Login = ({ navigation }) => {
       });
       if (response.status === 200) {
         Alert.alert("Login bem-sucedido!");
-        navigation.navigate("Home");
+        navigation.navigate("Roupa");
       } else {
         Alert.alert("Falha no login. Verifique sua senha.");
       }
