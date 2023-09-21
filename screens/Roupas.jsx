@@ -28,7 +28,7 @@ const dadosDaRoupa = [
 
 const Roupa = ({ navigation }) => {
   const [roupa, setRoupa] = useState(dadosDaRoupa);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(null);
   const [editedTamanho, setEditedTamanho] = useState("");
   const [editedCor, setEditedCor] = useState("");
