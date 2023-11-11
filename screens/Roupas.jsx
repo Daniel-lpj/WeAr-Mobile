@@ -32,6 +32,8 @@ const Roupa = ({ navigation }) => {
         const novaListaDeRoupas = [...roupa];
         novaListaDeRoupas.splice(roupa_id, 1);
         setRoupa(novaListaDeRoupas);
+        getRoupas();
+        Alert.alert("Roupa excluida com sucesso!");
       } else {
         Alert.alert("Erro ao excluir roupa.");
       }
@@ -55,6 +57,7 @@ const Roupa = ({ navigation }) => {
         novaListaDeRoupas[roupa_id].cor = editedCor;
         setRoupa(novaListaDeRoupas);
         setEditing(null);
+        getRoupas();
       } else {
         Alert.alert("Erro ao editar roupa.");
       }
@@ -77,6 +80,7 @@ const Roupa = ({ navigation }) => {
       const response = await api.post("/roupas", obj);
 
       if (response.status === 201) {
+        getRoupas();
         Alert.alert("Roupa salva com sucesso!");
       } else {
         Alert.alert("Falha para salvar.");
