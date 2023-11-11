@@ -18,6 +18,11 @@ const Roupa = ({ navigation }) => {
   const [editing, setEditing] = useState(null);
   const [editedTamanho, setEditedTamanho] = useState("");
   const [editedCor, setEditedCor] = useState("");
+  const [nome, setNome] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [preco, setPreco] = useState("");
+  const [cor, setCor] = useState("");
+  const [tamanho, setTamanho] = useState("");
 
   const deleteRoupa = async (roupa_id) => {
     try {
@@ -56,6 +61,28 @@ const Roupa = ({ navigation }) => {
     } catch (error) {
       Alert.alert("Erro ao editar roupa:", error);
       console.error("Erro ao editar roupa: ", error);
+    }
+  };
+
+  const saveRoupa = async () => {
+    const obj = {
+      nome: nome,
+      codigo: codigo,
+      preco: preco,
+      cor: cor,
+      tamanho: tamanho,
+    };
+
+    try {
+      const response = await api.post("/roupa", obj);
+      if (response.status === 200) {
+        Alert.alert("Roupa salva com sucesso!");
+      } else {
+        Alert.alert("Falha para salvar.");
+      }
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      Alert.alert("Erro ao salvar. Tente novamente mais tarde.");
     }
   };
 
@@ -134,6 +161,10 @@ const Roupa = ({ navigation }) => {
               style={styles.botaoExcluir}
             >
               <Icon name="trash" size={20} color="white" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={saveRoupa} style={styles.icon}>
+              <Icon name="save" size={20} color="white" />
             </TouchableOpacity>
           </View>
         ))
