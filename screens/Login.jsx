@@ -25,7 +25,8 @@ const Login = ({ navigation }) => {
 
     try {
       const response = await api.post("/login", obj);
-      if (response.status === 200) {
+
+      if (response.status === 201) {
         Alert.alert("Login bem-sucedido!");
         navigation.navigate("Roupa");
       } else {

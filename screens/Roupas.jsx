@@ -74,8 +74,9 @@ const Roupa = ({ navigation }) => {
     };
 
     try {
-      const response = await api.post("/roupa", obj);
-      if (response.status === 200) {
+      const response = await api.post("/roupas", obj);
+
+      if (response.status === 201) {
         Alert.alert("Roupa salva com sucesso!");
       } else {
         Alert.alert("Falha para salvar.");
@@ -163,7 +164,7 @@ const Roupa = ({ navigation }) => {
               <Icon name="trash" size={20} color="white" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={saveRoupa} style={styles.icon}>
+            <TouchableOpacity onPress={saveRoupa} style={styles.botaoSalvar}>
               <Icon name="save" size={20} color="white" />
             </TouchableOpacity>
           </View>
@@ -229,6 +230,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 5,
     right: 5,
+  },
+  botaoSalvar: {
+    backgroundColor: "#718096",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 30,
+    height: 30,
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    left: 72,
   },
   icon: {
     top: 1,
