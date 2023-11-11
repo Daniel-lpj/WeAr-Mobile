@@ -165,7 +165,7 @@ const Roupa = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity onPress={saveRoupa} style={styles.botaoSalvar}>
-              <Icon name="save" size={20} color="white" />
+              <Icon name="plus" size={20} color="white" />
             </TouchableOpacity>
           </View>
         ))
