@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,6 +10,7 @@ import {
   View,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { api } from "./api";
 
 const dadosDaRoupa = [
   {
@@ -36,18 +36,12 @@ const Roupa = ({ navigation }) => {
 
   const deleteRoupa = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/roupas/${id}`, {
-        method: "DELETE",
-      });
+      const response = await api.delete(`/roupas/${id}`);
+
       if (response.status === 204) {
         const novaListaDeRoupas = [...roupa];
         novaListaDeRoupas.splice(id, 1);
         setRoupa(novaListaDeRoupas);
-
-        await AsyncStorage.setItem(
-          "roupaData",
-          JSON.stringify(novaListaDeRoupas)
-        );
       } else {
         Alert.alert("Erro ao excluir roupa.");
       }
@@ -59,18 +53,11 @@ const Roupa = ({ navigation }) => {
 
   const editRoupa = async (id) => {
     try {
-      const data = JSON.stringify({
+      const obj = {
         tamanho: editedTamanho,
         cor: editedCor,
-      });
-
-      const response = await fetch(`http://localhost:8080/api/roupas/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: data,
-      });
+      };
+      const response = await api.put(`/roupas/${id}`, obj);
 
       if (response.status === 200) {
         const novaListaDeRoupas = [...roupa];
@@ -78,11 +65,6 @@ const Roupa = ({ navigation }) => {
         novaListaDeRoupas[id].cor = editedCor;
         setRoupa(novaListaDeRoupas);
         setEditing(null);
-
-        await AsyncStorage.setItem(
-          "roupaData",
-          JSON.stringify(novaListaDeRoupas)
-        );
       } else {
         Alert.alert("Erro ao editar roupa.");
       }
@@ -96,40 +78,19 @@ const Roupa = ({ navigation }) => {
     const getRoupas = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/api/roupas`);
-        if (!response.ok) {
-          Alert.alert("Erro ao buscar lista de roupas");
-        }
-        const data = await response.json();
-        setRoupa(data);
+        await api.get("/roupas").then((response) => {
+          if (response?.status !== 200) {
+            Alert.alert("Erro ao buscar lista de roupas");
+          }
+          setRoupa(response?.data);
+        });
         setLoading(false);
-
-        await AsyncStorage.setItem("roupaData", JSON.stringify(data));
       } catch (error) {
         console.error("Erro ao buscar lista de roupas: " + error);
         setLoading(false);
       }
     };
     getRoupas();
-  }, []);
-
-  const getRoupasAsyncStorage = async () => {
-    try {
-      const data = await AsyncStorage.getItem("roupaData");
-      if (data !== null) {
-        const parsedData = JSON.parse(data);
-        return parsedData;
-      }
-    } catch (error) {
-      console.error("Erro ao ler os dados do AsyncStorage:", error);
-    }
-    return [];
-  };
-
-  useEffect(() => {
-    getRoupasAsyncStorage().then((data) => {
-      setRoupa(data);
-    });
   }, []);
 
   return (

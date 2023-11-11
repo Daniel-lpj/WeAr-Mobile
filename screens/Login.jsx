@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import {
   Alert,
@@ -8,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { api } from "./api";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -18,32 +18,22 @@ const Login = ({ navigation }) => {
   };
 
   const handleLogin = async () => {
-    const data = {
+    const obj = {
       email: email,
       senha: senha,
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await api.post("/login", obj);
       if (response.status === 200) {
-        const userData = await response.json();
-
-        await AsyncStorage.setItem("userData", JSON.stringify(userData));
-
         Alert.alert("Login bem-sucedido!");
         navigation.navigate("Roupa");
       } else {
         Alert.alert("Falha no login. Verifique sua senha.");
       }
     } catch (error) {
-      console.error("Erro ao fazer login:", error);
-      Alert.alert("Erro ao fazer login. Tente novamente mais tarde.");
+      console.error("Erro ao fazer o login:", error);
+      Alert.alert("Erro ao fazer o login. Tente novamente mais tarde.");
     }
   };
 

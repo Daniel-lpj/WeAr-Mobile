@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import {
   Alert,
@@ -8,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { api } from "./api";
 
 const Cadastro = ({ navigation }) => {
   const [nome, setNome] = useState("");
@@ -15,25 +15,16 @@ const Cadastro = ({ navigation }) => {
   const [senha, setSenha] = useState("");
 
   const handleCadastro = async () => {
-    const data = {
+    const obj = {
       nome: nome,
       email: email,
       senha: senha,
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/registrar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (response.status === 200) {
-        const userData = await response.json();
+      const response = await api.post("/registrar", obj);
 
-        await AsyncStorage.setItem("userData", JSON.stringify(userData));
-
+      if (response.status === 201) {
         Alert.alert("Cadastro bem-sucedido!");
         navigation.navigate("Login");
       } else {
