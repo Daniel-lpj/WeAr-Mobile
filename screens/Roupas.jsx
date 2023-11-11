@@ -82,12 +82,15 @@ const Roupa = ({ navigation }) => {
 
       if (status === 201) {
         getRoupas();
-        Alert.alert("Roupa salva com sucesso!");
+        Alert.alert("Roupa adicionada com sucesso!");
       } else {
-        throw new Error(`Falha ao salvar roupa. Status: ${status}`);
+        throw new Error(`Falha ao adicionar roupa. Status: ${status}`);
       }
     } catch (error) {
-      handleError(error, "Erro ao salvar roupa. Tente novamente mais tarde.");
+      handleError(
+        error,
+        "Erro ao adicionar roupa. Tente novamente mais tarde."
+      );
     }
   };
 
