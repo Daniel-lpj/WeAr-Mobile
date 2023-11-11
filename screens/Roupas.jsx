@@ -12,35 +12,20 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 import { api } from "./api";
 
-const dadosDaRoupa = [
-  {
-    tamanho: "M",
-    cor: "Preta",
-    imagemUrl:
-      "https://firebasestorage.googleapis.com/v0/b/unify-v3-copy.appspot.com/o/zhudrauta38-2%3A10?alt=media&token=59e33f30-f34c-4d9a-941f-75fbee401a9a",
-  },
-  {
-    tamanho: "G",
-    cor: "Preta",
-    imagemUrl:
-      "https://firebasestorage.googleapis.com/v0/b/unify-v3-copy.appspot.com/o/zhudrauta38-2%3A10?alt=media&token=59e33f30-f34c-4d9a-941f-75fbee401a9a",
-  },
-];
-
 const Roupa = ({ navigation }) => {
-  const [roupa, setRoupa] = useState(dadosDaRoupa);
+  const [roupa, setRoupa] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(null);
   const [editedTamanho, setEditedTamanho] = useState("");
   const [editedCor, setEditedCor] = useState("");
 
-  const deleteRoupa = async (id) => {
+  const deleteRoupa = async (roupa_id) => {
     try {
-      const response = await api.delete(`/roupas/${id}`);
+      const response = await api.delete(`/roupas/${roupa_id}`);
 
       if (response.status === 204) {
         const novaListaDeRoupas = [...roupa];
-        novaListaDeRoupas.splice(id, 1);
+        novaListaDeRoupas.splice(roupa_id, 1);
         setRoupa(novaListaDeRoupas);
       } else {
         Alert.alert("Erro ao excluir roupa.");
@@ -51,18 +36,18 @@ const Roupa = ({ navigation }) => {
     }
   };
 
-  const editRoupa = async (id) => {
+  const editRoupa = async (roupa_id) => {
     try {
       const obj = {
         tamanho: editedTamanho,
         cor: editedCor,
       };
-      const response = await api.put(`/roupas/${id}`, obj);
+      const response = await api.put(`/roupas/${roupa_id}`, obj);
 
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         const novaListaDeRoupas = [...roupa];
-        novaListaDeRoupas[id].tamanho = editedTamanho;
-        novaListaDeRoupas[id].cor = editedCor;
+        novaListaDeRoupas[roupa_id].tamanho = editedTamanho;
+        novaListaDeRoupas[roupa_id].cor = editedCor;
         setRoupa(novaListaDeRoupas);
         setEditing(null);
       } else {
@@ -74,22 +59,24 @@ const Roupa = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    const getRoupas = async () => {
-      try {
-        setLoading(true);
-        await api.get("/roupas").then((response) => {
-          if (response?.status !== 200) {
-            Alert.alert("Erro ao buscar lista de roupas");
-          }
-          setRoupa(response?.data);
-        });
-        setLoading(false);
-      } catch (error) {
-        console.error("Erro ao buscar lista de roupas: " + error);
+  const getRoupas = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/roupas");
+
+      if (response?.status !== 200) {
+        Alert.alert("Erro ao buscar lista de roupas");
+      } else {
+        setRoupa(response?.data);
         setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Erro ao buscar lista de roupas: ", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     getRoupas();
   }, []);
 
@@ -101,7 +88,9 @@ const Roupa = ({ navigation }) => {
         roupa.map((item, index) => (
           <View key={index} style={styles.card}>
             <Image
-              source={{ uri: item.imagemUrl }}
+              source={{
+                uri: "https://firebasestorage.googleapis.com/v0/b/unify-v3-copy.appspot.com/o/zhudrauta38-2%3A10?alt=media&token=59e33f30-f34c-4d9a-941f-75fbee401a9a",
+              }}
               style={styles.imagem}
               resizeMode="cover"
             />
@@ -119,7 +108,7 @@ const Roupa = ({ navigation }) => {
                   onChangeText={setEditedCor}
                   style={styles.input}
                 />
-                <TouchableOpacity onPress={() => editRoupa(index)}>
+                <TouchableOpacity onPress={() => editRoupa(item.roupa_id)}>
                   <Icon name="check" size={20} color="white" />
                 </TouchableOpacity>
               </>
@@ -141,7 +130,7 @@ const Roupa = ({ navigation }) => {
               </>
             )}
             <TouchableOpacity
-              onPress={() => deleteRoupa(index)}
+              onPress={() => deleteRoupa(item.roupa_id)}
               style={styles.botaoExcluir}
             >
               <Icon name="trash" size={20} color="white" />
