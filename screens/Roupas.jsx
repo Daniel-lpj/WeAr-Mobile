@@ -24,22 +24,29 @@ const Roupa = ({ navigation }) => {
   const [cor, setCor] = useState("");
   const [tamanho, setTamanho] = useState("");
 
+  const handleError = (error, message) => {
+    console.error(`${message}:`, error);
+    Alert.alert(message, error.message || "Erro desconhecido");
+  };
+
   const deleteRoupa = async (roupa_id) => {
     try {
       const response = await api.delete(`/roupas/${roupa_id}`);
+      const { status } = response;
 
-      if (response.status === 204) {
-        const novaListaDeRoupas = [...roupa];
-        novaListaDeRoupas.splice(roupa_id, 1);
+      if (status === 204) {
+        const novaListaDeRoupas = roupa.filter(
+          (_, index) => index !== roupa_id
+        );
+
         setRoupa(novaListaDeRoupas);
         getRoupas();
-        Alert.alert("Roupa excluida com sucesso!");
+        Alert.alert("Roupa excluída com sucesso!");
       } else {
-        Alert.alert("Erro ao excluir roupa.");
+        throw new Error(`Erro ao excluir roupa. Status: ${status}`);
       }
     } catch (error) {
-      Alert.alert("Erro ao excluir roupa:", error);
-      console.error("Erro ao buscar lista de roupas: ", error);
+      handleError(error, "Erro ao excluir roupa");
     }
   };
 
@@ -49,21 +56,25 @@ const Roupa = ({ navigation }) => {
         tamanho: editedTamanho,
         cor: editedCor,
       };
-      const response = await api.put(`/roupas/${roupa_id}`, obj);
 
-      if (response.status === 200 || response.status === 201) {
-        const novaListaDeRoupas = [...roupa];
-        novaListaDeRoupas[roupa_id].tamanho = editedTamanho;
-        novaListaDeRoupas[roupa_id].cor = editedCor;
+      const response = await api.put(`/roupas/${roupa_id}`, obj);
+      const { status } = response;
+
+      if (status === 200 || status === 201) {
+        const novaListaDeRoupas = roupa.map((item, index) =>
+          index === roupa_id
+            ? { ...item, tamanho: editedTamanho, cor: editedCor }
+            : item
+        );
+
         setRoupa(novaListaDeRoupas);
         setEditing(null);
         getRoupas();
       } else {
-        Alert.alert("Erro ao editar roupa.");
+        throw new Error(`Erro ao editar roupa. Status: ${status}`);
       }
     } catch (error) {
-      Alert.alert("Erro ao editar roupa:", error);
-      console.error("Erro ao editar roupa: ", error);
+      handleError(error, "Erro ao editar roupa");
     }
   };
 
@@ -78,16 +89,16 @@ const Roupa = ({ navigation }) => {
 
     try {
       const response = await api.post("/roupas", obj);
+      const { status } = response;
 
-      if (response.status === 201) {
+      if (status === 201) {
         getRoupas();
         Alert.alert("Roupa salva com sucesso!");
       } else {
-        Alert.alert("Falha para salvar.");
+        throw new Error(`Falha ao salvar roupa. Status: ${status}`);
       }
     } catch (error) {
-      console.error("Erro ao salvar:", error);
-      Alert.alert("Erro ao salvar. Tente novamente mais tarde.");
+      handleError(error, "Erro ao salvar roupa. Tente novamente mais tarde.");
     }
   };
 
@@ -95,15 +106,16 @@ const Roupa = ({ navigation }) => {
     try {
       setLoading(true);
       const response = await api.get("/roupas");
+      const { status, data } = response;
 
-      if (response?.status !== 200) {
-        Alert.alert("Erro ao buscar lista de roupas");
+      if (status === 200) {
+        setRoupa(data);
       } else {
-        setRoupa(response?.data);
-        setLoading(false);
+        throw new Error("Erro ao buscar lista de roupas");
       }
     } catch (error) {
-      console.error("Erro ao buscar lista de roupas: ", error);
+      handleError(error, "Erro ao buscar lista de roupas");
+    } finally {
       setLoading(false);
     }
   };
