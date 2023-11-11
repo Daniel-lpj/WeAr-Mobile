@@ -18,11 +18,6 @@ const Roupa = ({ navigation }) => {
   const [editing, setEditing] = useState(null);
   const [editedTamanho, setEditedTamanho] = useState("");
   const [editedCor, setEditedCor] = useState("");
-  const [nome, setNome] = useState("");
-  const [codigo, setCodigo] = useState("");
-  const [preco, setPreco] = useState("");
-  const [cor, setCor] = useState("");
-  const [tamanho, setTamanho] = useState("");
 
   const handleError = (error, message) => {
     console.error(`${message}:`, error);
@@ -79,13 +74,7 @@ const Roupa = ({ navigation }) => {
   };
 
   const saveRoupa = async () => {
-    const obj = {
-      nome: nome,
-      codigo: codigo,
-      preco: preco,
-      cor: cor,
-      tamanho: tamanho,
-    };
+    const obj = {};
 
     try {
       const response = await api.post("/roupas", obj);
